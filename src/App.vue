@@ -3,7 +3,7 @@
 
     <!-- Formulario -->
     <form
-      @submit.prevent="handleSubmit"
+      @submit.prevent="handleSubmit()"
       class="bg-white rounded-lg shadow-md p-6"
     >
       <div v-for="field in formConfig" :key="field.name" class="mb-6">
@@ -148,16 +148,12 @@
         </button>
         <button
           type="submit"
-          :disabled="!isFormValid || !hasSignature"
           class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Completar Compra
         </button>
       </div>
     </form>
-
-    <!-- Componente de éxito -->
-    <SuccesBuyComponent v-if="showSuccessMessage" />
   </div>
 </template>
 
@@ -253,11 +249,16 @@ export default {
   },
   computed: {
     isFormValid() {
-      return Object.keys(this.errors).length === 0 && 
-        this.formConfig.every(field => 
-          !field.required || this.formData[field.name]
-        );
-    }
+    console.log("Checking form validity...");
+    console.log("Errors:", this.errors);
+    console.log("Form data:", this.formData);
+    return Object.keys(this.errors).length === 0 && 
+      this.formConfig.every(field => {
+        const isValid = !field.required || this.formData[field.name];
+        console.log(`Field ${field.name} valid:`, isValid);
+        return isValid;
+      });
+    } 
   },
   methods: {
 
@@ -429,11 +430,14 @@ export default {
         this.validateField(field.name);
       });
 
+      console.log(this.hasSignature , "   dddd")
       if (!this.hasSignature) {
         this.showSignatureError = true;
         return false;
       }
 
+      console.log(this.isFormValid, "  2")
+      console.log(this.hasSignature, "  3")
       return this.isFormValid && this.hasSignature;
     },
 
@@ -442,7 +446,7 @@ export default {
     },
   resetForm() {
       Object.keys(this.formData).forEach(key => {
-        this.formData[key] = this.formConfig.find(f => f.name === key).type === 'checkbox' ? false : '';
+        this.formData[key] = this.formConfig.find(f => f.name === key).type === 'checkbox' || this.formConfig.find(f => f.name === key).type === 'switch' ? false : '';
       });
       this.clearSignature();
       this.hasSignature = false;
@@ -451,32 +455,37 @@ export default {
     },
 
     handleSubmit() {
-      if (!this.validateForm()) {
-        console.log('Formulario inválido');
-        return;
-      }
-      
-      const signatureData = this.getSignatureData();
-      const submitData = {
-        ...this.formData,
-        signature: signatureData,
-      };
-      
-      console.log('Datos del formulario:', submitData);
-      
-      // Mostrar mensaje de éxito
-      this.showSuccessMessage = true;
-
-      
-      // Aquí puedes agregar la lógica para enviar los datos al servidor
-    }
+  console.log("Iniciando submit...");
+  
+  // Verificar el estado de la validación
+  const isValid = this.validateForm();
+  console.log("¿Formulario válido?:", isValid);
+  
+  if (!isValid) {
+    console.log('Formulario inválido');
+    console.log('Errores:', this.errors);
+    console.log('Estado de firma:', this.hasSignature);
+    return;
+  }
+  
+  const signatureData = this.getSignatureData();
+  const submitData = {
+    ...this.formData,
+    signature: signatureData,
+  };
+  
+  console.log('Datos del formulario:', submitData);
+  
+  // Mostrar mensaje de éxito
+  this.showSuccessMessage = true;
+}
   },
   
   async mounted() {
     console.log("Componente montado");
     // Inicializar formData
     this.formConfig.forEach(field => {
-      this.formData[field.name] = field.type === 'checkbox' ? false : '';
+      this.formData[field.name] = field.type === 'checkbox' || field.type === 'switch' ? false : '';
     });
 
     // Solo inicializar el canvas si el formulario está visible
