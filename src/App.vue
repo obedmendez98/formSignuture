@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-4xl mx-auto p-4">
 
-    <!-- Formulario -->
+    <!-- Form -->
     <form
       @submit.prevent="handleSubmit()"
       class="bg-white rounded-lg shadow-md p-6"
@@ -12,7 +12,7 @@
           <span v-if="field.required" class="text-red-500">*</span>
         </label>
 
-        <!-- Input de texto o email -->
+        <!-- Text or Email Input -->
         <div v-if="['text', 'email'].includes(field.type)" class="relative">
           <input
             :type="field.type"
@@ -58,56 +58,56 @@
           <span class="text-sm text-gray-700">{{ field.label }}</span>
         </div>
 
-        <!-- Campo de fecha -->
-  <div v-else-if="field.type === 'date'" class="relative">
-    <input
-      type="date"
-      :id="field.name"
-      :name="field.name"
-      v-model="formData[field.name]"
-      @blur="validateField(field.name)"
-      class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-      :class="{'border-red-500': errors[field.name], 'border-gray-300': !errors[field.name]}"
-    />
-    <span v-if="errors[field.name]" class="text-red-500 text-sm mt-1 block">
-      {{ errors[field.name] }}
-    </span>
-  </div>
+        <!-- Date Input -->
+        <div v-else-if="field.type === 'date'" class="relative">
+          <input
+            type="date"
+            :id="field.name"
+            :name="field.name"
+            v-model="formData[field.name]"
+            @blur="validateField(field.name)"
+            class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            :class="{'border-red-500': errors[field.name], 'border-gray-300': !errors[field.name]}"
+          />
+          <span v-if="errors[field.name]" class="text-red-500 text-sm mt-1 block">
+            {{ errors[field.name] }}
+          </span>
+        </div>
 
-  <!-- Campo de hora -->
-  <div v-else-if="field.type === 'time'" class="relative">
-    <input
-      type="time"
-      :id="field.name"
-      :name="field.name"
-      v-model="formData[field.name]"
-      @blur="validateField(field.name)"
-      class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-      :class="{'border-red-500': errors[field.name], 'border-gray-300': !errors[field.name]}"
-    />
-    <span v-if="errors[field.name]" class="text-red-500 text-sm mt-1 block">
-      {{ errors[field.name] }}
-    </span>
-  </div>
+        <!-- Time Input -->
+        <div v-else-if="field.type === 'time'" class="relative">
+          <input
+            type="time"
+            :id="field.name"
+            :name="field.name"
+            v-model="formData[field.name]"
+            @blur="validateField(field.name)"
+            class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            :class="{'border-red-500': errors[field.name], 'border-gray-300': !errors[field.name]}"
+          />
+          <span v-if="errors[field.name]" class="text-red-500 text-sm mt-1 block">
+            {{ errors[field.name] }}
+          </span>
+        </div>
 
-  <!-- Switch -->
-  <div v-else-if="field.type === 'switch'" class="flex items-center gap-2">
-    <input
-      type="checkbox"
-      :id="field.name"
-      :name="field.name"
-      v-model="formData[field.name]"
-      class="w-5 h-5 cursor-pointer transition-colors"
-    />
-    <span class="text-sm text-gray-700">{{ field.label }}</span>
-  </div>
+        <!-- Switch -->
+        <div v-else-if="field.type === 'switch'" class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            :id="field.name"
+            :name="field.name"
+            v-model="formData[field.name]"
+            class="w-5 h-5 cursor-pointer transition-colors"
+          />
+          <span class="text-sm text-gray-700">{{ field.label }}</span>
+        </div>
 
       </div>
 
-      <!-- Canvas para firma -->
+      <!-- Signature Canvas -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Firma
+          Signature
           <span class="text-red-500">*</span>
         </label>
         <div class="relative" ref="canvasContainer">
@@ -128,35 +128,34 @@
               @click="clearSignature"
               class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
             >
-              Limpiar firma
+              Clear Signature
             </button>
             <span v-if="!hasSignature && showSignatureError" class="text-red-500 text-sm">
-              La firma es requerida
+              Signature is required
             </span>
           </div>
         </div>
       </div>
 
-      <!-- Botones de acción -->
+      <!-- Action Buttons -->
       <div class="flex justify-end gap-4">
         <button
           type="button"
           @click="cancelForm"
           class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
         >
-          Cancelar
+          Cancel
         </button>
         <button
           type="submit"
           class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Completar Compra
+          Complete Purchase
         </button>
       </div>
     </form>
   </div>
 </template>
-
 
 <script>
 import { ref, reactive, nextTick } from 'vue';
@@ -263,7 +262,7 @@ export default {
   methods: {
 
     async initCanvas() {
-      console.log('Iniciando canvas...');
+      //console.log('Iniciando canvas...');
       
       if (this.canvasRetries >= this.maxCanvasRetries) {
         console.error('Max canvas initialization retries reached');
@@ -276,7 +275,7 @@ export default {
       const container = this.$refs.canvasContainer;
       
       if (!canvas || !container) {
-        console.log('Canvas o container no encontrados, reintentando...');
+        //console.log('Canvas o container no encontrados, reintentando...');
         this.canvasRetries++;
         setTimeout(() => this.initCanvas(), 100);
         return;
@@ -285,7 +284,7 @@ export default {
       // Obtener dimensiones del contenedor
       const containerWidth = container.offsetWidth;
       if (containerWidth === 0) {
-        console.log('Contenedor con ancho 0, reintentando...');
+        //console.log('Contenedor con ancho 0, reintentando...');
         this.canvasRetries++;
         setTimeout(() => this.initCanvas(), 100);
         return;
@@ -308,7 +307,7 @@ export default {
       this.signatureContext.lineJoin = 'round';
 
       this.canvasInitialized = true;
-      console.log('Canvas inicializado correctamente');
+      //console.log('Canvas inicializado correctamente');
 
       // Configurar ResizeObserver
       if (!this.resizeObserver) {
@@ -455,11 +454,11 @@ export default {
     },
 
     handleSubmit() {
-  console.log("Iniciando submit...");
+  //console.log("Iniciando submit...");
   
   // Verificar el estado de la validación
   const isValid = this.validateForm();
-  console.log("¿Formulario válido?:", isValid);
+  //console.log("¿Formulario válido?:", isValid);
   
   if (!isValid) {
     console.log('Formulario inválido');
@@ -474,7 +473,7 @@ export default {
     signature: signatureData,
   };
   
-  console.log('Datos del formulario:', submitData);
+  console.log('form:', submitData);
   
   // Mostrar mensaje de éxito
   this.showSuccessMessage = true;
@@ -482,7 +481,7 @@ export default {
   },
   
   async mounted() {
-    console.log("Componente montado");
+    //console.log("Componente montado");
     // Inicializar formData
     this.formConfig.forEach(field => {
       this.formData[field.name] = field.type === 'checkbox' || field.type === 'switch' ? false : '';

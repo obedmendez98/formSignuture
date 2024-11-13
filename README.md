@@ -2,76 +2,70 @@
 
 ## Project setup
 ```
-🌟 Proyecto de Formulario Dinámico en Vue.js 🌟
-Un formulario dinámico y configurable en Vue.js que permite crear y validar formularios personalizados con facilidad.
+🌟 Dynamic Form Project in Vue.js 🌟
+A dynamic and configurable form in Vue.js that allows you to create and validate custom forms with ease.
 
-📋 Tabla de Contenidos
-Características
-Requisitos
-Instalación
-Configuración del Formulario
-Ejecución en Desarrollo
-Construcción para Producción
-Estructura del Proyecto
-Contribuciones
-✨ Características
-Configuración Dinámica del Formulario: Define los campos del formulario en el objeto formConfig.
-Validación en Tiempo Real: Muestra mensajes de error específicos para cada campo si la validación falla.
-Soporte para Varios Tipos de Datos: Campos de texto, email, fecha, hora y switches (checkboxes personalizados).
-📦 Requisitos
-Node.js (versión 12 o superior)
-NPM (generalmente incluido con Node.js)
-Vue CLI para manejar el proyecto de Vue
-🛠️ Instalación
-Clona el repositorio
+📋 Table of Contents
+- Features
+- Requirements
+- Installation
+- Form Configuration
+- Running in Development
+- Building for Production
+- Project Structure
+- Contributions
 
-bash
-Copiar código
-git clone https://github.com/usuario/proyecto-formulario-vue.git
-cd proyecto-formulario-vue
-Instala Vue CLI Si no tienes Vue CLI instalado globalmente, puedes hacerlo con:
+✨ Features
+- **Dynamic Form Configuration**: Define form fields in the `formConfig` object.
+- **Real-Time Validation**: Shows specific error messages for each field if validation fails.
+- **Support for Multiple Data Types**: Text fields, email, date, time, and custom switches (checkboxes).
 
-bash
-Copiar código
+📦 Requirements
+- **Node.js** (version 12 or higher)
+- **NPM** (usually included with Node.js)
+- **Vue CLI** to manage the Vue project
+
+🛠️ Installation
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/username/vue-form-project.git
+cd formsignuture
+
+Install Vue CLI
+If you don't have Vue CLI installed globally, install it with:
+
 npm install -g @vue/cli
-Instala las dependencias del proyecto Ejecuta el siguiente comando en la raíz del proyecto para instalar todas las dependencias necesarias:
+Install project dependencies
+Run the following command in the project root to install all necessary dependencies:
 
-bash
-Copiar código
 npm install
-🔧 Configuración del Formulario
-El formulario se configura en el archivo src/components/Form.vue usando un objeto formConfig que define los campos. Ejemplo de configuración:
+🔧 Form Configuration The form is configured in the src/components/Form.vue file using a formConfig object that defines the fields. Example configuration:
 
-javascript
-Copiar código
+
 data() {
   return {
     formConfig: [
-      { name: 'name', label: 'Nombre completo', type: 'text', required: true },
-      { name: 'email', label: 'Correo electrónico', type: 'email', required: true },
-      { name: 'birthdate', label: 'Fecha de nacimiento', type: 'date', required: true },
-      { name: 'appointmentTime', label: 'Hora de cita', type: 'time', required: true },
-      { name: 'subscribe', label: 'Suscribirse a la newsletter', type: 'switch', required: false }
+      { name: 'name', label: 'Full Name', type: 'text', required: true },
+      { name: 'email', label: 'Email', type: 'email', required: true },
+      { name: 'birthdate', label: 'Birthdate', type: 'date', required: true },
+      { name: 'appointmentTime', label: 'Appointment Time', type: 'time', required: true },
+      { name: 'subscribe', label: 'Subscribe to Newsletter', type: 'switch', required: false }
     ]
   };
 }
-🚀 Ejecución en Desarrollo
-Para ejecutar el proyecto en modo de desarrollo y ver los cambios en tiempo real, utiliza:
+🚀 Running in Development To run the project in development mode and see real-time changes, use:
 
-bash
-Copiar código
 npm run serve
-Esto iniciará la aplicación en modo de desarrollo y estará disponible en http://localhost:8080.
+This will start the application in development mode, available at http://localhost:8080.
 
-📦 Construcción para Producción
-Si deseas construir la aplicación para producción, ejecuta:
+📦 Building for Production To build the application for production, run:
 
-bash
-Copiar código
 npm run build
-Esto generará una versión optimizada en la carpeta dist, lista para ser desplegada.
+This will generate an optimized version in the dist folder, ready to be deployed.
 
-📂 Estructura del Proyecto
-src/components: Contiene los componentes de Vue, como el formulario y los elementos de entrada.
-src/App.vue: Componente principal de la aplicación.
-src/main.js: Archivo de entrada de Vue donde se inicializa la aplicación.
+📂 Project Structure
+
+src/components: Contains Vue components, such as the form and input elements.
+src/App.vue: Main application component.
+src/main.js: Vue entry file where the application is initialized.
