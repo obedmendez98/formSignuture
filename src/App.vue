@@ -1,6 +1,5 @@
 <template>
   <div class="max-w-4xl mx-auto p-4">
-
     <!-- Form -->
     <form
       @submit.prevent="handleSubmit()"
@@ -188,56 +187,57 @@ export default {
   data() {
     return {
       formConfig: [
-        { 
-          name: 'name', 
-          label: 'Nombre completo', 
-          type: 'text', 
-          required: true, 
-          minLength: 3, 
-          maxLength: 50,
-          placeholder: 'Ingrese su nombre completo'
-        },
-        { 
-          name: 'email', 
-          label: 'Correo electrónico', 
-          type: 'email', 
-          required: true,
-          placeholder: 'ejemplo@correo.com'
-        },
-        { 
-          name: 'address', 
-          label: 'Dirección de envío', 
-          type: 'textarea', 
-          required: true, 
-          minLength: 10, 
-          maxLength: 500,
-          placeholder: 'Ingrese su dirección completa'
-        },
-        { 
-          name: 'terms', 
-          label: 'Acepto los términos y condiciones', 
-          type: 'checkbox',
-          required: true
-        },
-        { 
-        name: 'birthdate', 
-        label: 'Fecha de nacimiento', 
-        type: 'date', 
-        required: true
-      },
-      { 
-        name: 'appointmentTime', 
-        label: 'Hora de cita', 
-        type: 'time', 
-        required: true
-      },
-      { 
-        name: 'subscribe', 
-        label: 'Suscribirse a la newsletter', 
-        type: 'switch', 
-        required: false 
-      }
-      ],
+    { 
+      name: 'name', 
+      label: 'Full Name', 
+      type: 'text', 
+      required: true, 
+      minLength: 3, 
+      maxLength: 50,
+      placeholder: 'Enter your full name'
+    },
+    { 
+      name: 'email', 
+      label: 'Email Address', 
+      type: 'email', 
+      required: true,
+      placeholder: 'example@email.com'
+    },
+    { 
+      name: 'address', 
+      label: 'Shipping Address', 
+      type: 'textarea', 
+      required: true, 
+      minLength: 10, 
+      maxLength: 500,
+      placeholder: 'Enter your complete address'
+    },
+    { 
+      name: 'terms', 
+      label: 'I accept the terms and conditions', 
+      type: 'checkbox',
+      required: true
+    },
+    { 
+      name: 'birthdate', 
+      label: 'Date of Birth', 
+      type: 'date', 
+      required: true
+    },
+    { 
+      name: 'appointmentTime', 
+      label: 'Appointment Time', 
+      type: 'time', 
+      required: true
+    },
+    { 
+      name: 'subscribe', 
+      label: 'Subscribe to the newsletter', 
+      type: 'switch', 
+      required: false 
+    }
+],
+
       signatureContext: null,
       lastX: 0,
       lastY: 0,
@@ -296,7 +296,7 @@ export default {
 
       this.signatureContext = canvas.getContext('2d');
       if (!this.signatureContext) {
-        console.error('No se pudo obtener el contexto del canvas');
+        console.error('error canvas');
         return;
       }
 
@@ -321,29 +321,46 @@ export default {
     },
 
     validateField(fieldName) {
+      console.log(fieldName)
       const field = this.formConfig.find(f => f.name === fieldName);
+      console.log(field);
       if (!field) return;
 
       delete this.errors[fieldName];
+      console.log("1")
 
       if (field.required && !this.formData[fieldName]) {
+        console.log("2")
+
         this.errors[fieldName] = 'Este campo es requerido';
       }
 
       if (field.type === 'email' && this.formData[fieldName]) {
+        console.log("3")
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(this.formData[fieldName])) {
+          console.log("4")
+
           this.errors[fieldName] = 'Por favor ingrese un email válido';
+          
         }
       }
 
       if (field.minLength && this.formData[fieldName].length < field.minLength) {
+        console.log("5")
+
         this.errors[fieldName] = `Mínimo ${field.minLength} caracteres`;
+        console.log(this.errors[fieldName])
       }
 
       if (field.maxLength && this.formData[fieldName].length > field.maxLength) {
+        console.log("6")
+
         this.errors[fieldName] = `Máximo ${field.maxLength} caracteres`;
       }
+
+      console.log(this.errors[fieldName])
     },
 
     handleTouchStart(event) {
