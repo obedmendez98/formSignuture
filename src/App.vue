@@ -18,7 +18,7 @@
             :id="field.name"
             :name="field.name"
             v-model="formData[field.name]"
-            @blur="validateField(field.name)"
+            v-on:blur="validateField(field.name)"
             :placeholder="field.placeholder || ''"
             class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             :class="{'border-red-500': errors[field.name], 'border-gray-300': !errors[field.name]}"
@@ -157,254 +157,154 @@
 </template>
 
 <script>
-import { ref, reactive, nextTick } from 'vue';
 
 export default {
   name: 'App',
-  setup() {
-    const showSuccessMessage = ref(false);
-    const formData = reactive({});
-    const errors = reactive({});
-    const isDrawing = ref(false);
-    const signatureRef = ref(null);
-    const canvasContainer = ref(null);
-    const hasSignature = ref(false);
-    const showSignatureError = ref(false);
-    const canvasInitialized = ref(false);
-
-    return {
-      showSuccessMessage,
-      formData,
-      errors,
-      isDrawing,
-      signatureRef,
-      canvasContainer,
-      hasSignature,
-      showSignatureError,
-      canvasInitialized
-    };
-  },
   data() {
     return {
-      formConfig: [
-    { 
-      name: 'name', 
-      label: 'Full Name', 
-      type: 'text', 
-      required: true, 
-      minLength: 3, 
-      maxLength: 50,
-      placeholder: 'Enter your full name'
-    },
-    { 
-      name: 'email', 
-      label: 'Email Address', 
-      type: 'email', 
-      required: true,
-      placeholder: 'example@email.com'
-    },
-    { 
-      name: 'address', 
-      label: 'Shipping Address', 
-      type: 'textarea', 
-      required: true, 
-      minLength: 10, 
-      maxLength: 500,
-      placeholder: 'Enter your complete address'
-    },
-    { 
-      name: 'terms', 
-      label: 'I accept the terms and conditions', 
-      type: 'checkbox',
-      required: true
-    },
-    { 
-      name: 'birthdate', 
-      label: 'Date of Birth', 
-      type: 'date', 
-      required: true
-    },
-    { 
-      name: 'appointmentTime', 
-      label: 'Appointment Time', 
-      type: 'time', 
-      required: true
-    },
-    { 
-      name: 'subscribe', 
-      label: 'Subscribe to the newsletter', 
-      type: 'switch', 
-      required: false 
-    }
-],
-
+      showSuccessMessage: false,
+      formData: {},
+      errors: {},
+      isDrawing: false,
+      hasSignature: false,
+      showSignatureError: false,
+      canvasInitialized: false,
       signatureContext: null,
       lastX: 0,
       lastY: 0,
       resizeObserver: null,
       canvasRetries: 0,
-      maxCanvasRetries: 3
+      maxCanvasRetries: 3,
+      formConfig: [
+        { name: 'name', label: 'Full Name', type: 'text', required: true, minLength: 3, maxLength: 50, placeholder: 'Enter your full name' },
+        { name: 'email', label: 'Email Address', type: 'email', required: true, placeholder: 'example@email.com' },
+        { name: 'address', label: 'Shipping Address', type: 'textarea', required: true, minLength: 10, maxLength: 500, placeholder: 'Enter your complete address' },
+        { name: 'terms', label: 'I accept the terms and conditions', type: 'checkbox', required: true },
+        { name: 'birthdate', label: 'Date of Birth', type: 'date', required: true },
+        { name: 'appointmentTime', label: 'Appointment Time', type: 'time', required: true },
+        { name: 'subscribe', label: 'Subscribe to the newsletter', type: 'switch', required: false }
+      ]
     };
   },
   computed: {
     isFormValid() {
-    console.log("Checking form validity...");
-    console.log("Errors:", this.errors);
-    console.log("Form data:", this.formData);
-    return Object.keys(this.errors).length === 0 && 
-      this.formConfig.every(field => {
-        const isValid = !field.required || this.formData[field.name];
-        console.log(`Field ${field.name} valid:`, isValid);
-        return isValid;
-      });
-    } 
+      return Object.keys(this.errors).length === 0 &&
+        this.formConfig.every(field => !field.required || this.formData[field.name]);
+    }
   },
   methods: {
-
     async initCanvas() {
-      //console.log('Iniciando canvas...');
-      
       if (this.canvasRetries >= this.maxCanvasRetries) {
         console.error('Max canvas initialization retries reached');
         return;
       }
 
-      await nextTick();
-      
-      const canvas = this.$refs.signatureRef;
-      const container = this.$refs.canvasContainer;
-      
-      if (!canvas || !container) {
-        //console.log('Canvas o container no encontrados, reintentando...');
-        this.canvasRetries++;
-        setTimeout(() => this.initCanvas(), 100);
-        return;
-      }
+      this.$nextTick(() => {
+        const canvas = this.$refs.signatureRef;
+        const container = this.$refs.canvasContainer;
 
-      // Obtener dimensiones del contenedor
-      const containerWidth = container.offsetWidth;
-      if (containerWidth === 0) {
-        //console.log('Contenedor con ancho 0, reintentando...');
-        this.canvasRetries++;
-        setTimeout(() => this.initCanvas(), 100);
-        return;
-      }
+        if (!canvas || !container) {
+          this.canvasRetries++;
+          setTimeout(this.initCanvas, 100);
+          return;
+        }
 
-      // Configurar canvas
-      canvas.width = containerWidth;
-      canvas.height = 160; // height-40 en píxeles
+        const containerWidth = container.offsetWidth;
+        if (containerWidth === 0) {
+          this.canvasRetries++;
+          setTimeout(this.initCanvas, 100);
+          return;
+        }
 
-      this.signatureContext = canvas.getContext('2d');
-      if (!this.signatureContext) {
-        console.error('error canvas');
-        return;
-      }
+        canvas.width = containerWidth;
+        canvas.height = 160;
+        this.signatureContext = canvas.getContext('2d');
+        if (!this.signatureContext) {
+          console.error('error canvas');
+          return;
+        }
 
-      // Configurar contexto
-      this.signatureContext.strokeStyle = '#000';
-      this.signatureContext.lineWidth = 2;
-      this.signatureContext.lineCap = 'round';
-      this.signatureContext.lineJoin = 'round';
+        this.signatureContext.strokeStyle = '#000';
+        this.signatureContext.lineWidth = 2;
+        this.signatureContext.lineCap = 'round';
+        this.signatureContext.lineJoin = 'round';
+        this.canvasInitialized = true;
 
-      this.canvasInitialized = true;
-      //console.log('Canvas inicializado correctamente');
-
-      // Configurar ResizeObserver
-      if (!this.resizeObserver) {
-        this.resizeObserver = new ResizeObserver(() => {
-          if (this.canvasInitialized) {
-            this.initCanvas();
-          }
-        });
-        this.resizeObserver.observe(container);
-      }
+        if (!this.resizeObserver) {
+          this.resizeObserver = new ResizeObserver(() => {
+            if (this.canvasInitialized) {
+              this.initCanvas();
+            }
+          });
+          this.resizeObserver.observe(container);
+        }
+      });
     },
 
-    validateField(fieldName) {
-      console.log(fieldName)
+    validateFieldz(fieldName) {
       const field = this.formConfig.find(f => f.name === fieldName);
-      console.log(field);
       if (!field) return;
 
       delete this.errors[fieldName];
-      console.log("1")
 
       if (field.required && !this.formData[fieldName]) {
-        console.log("2")
-
-        this.errors[fieldName] = 'Este campo es requerido';
+        this.errors[fieldName] = 'This field is required';
       }
 
       if (field.type === 'email' && this.formData[fieldName]) {
-        console.log("3")
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(this.formData[fieldName])) {
-          console.log("4")
-
-          this.errors[fieldName] = 'Por favor ingrese un email válido';
-          
+          this.errors[fieldName] = 'Please enter a valid email';
         }
       }
 
       if (field.minLength && this.formData[fieldName].length < field.minLength) {
-        console.log("5")
-
-        this.errors[fieldName] = `Mínimo ${field.minLength} caracteres`;
-        console.log(this.errors[fieldName])
+        this.errors[fieldName] = `Minimum ${field.minLength} characters`;
       }
 
       if (field.maxLength && this.formData[fieldName].length > field.maxLength) {
-        console.log("6")
+        this.errors[fieldName] = `Maximum ${field.maxLength} characters`;
+      }
+    },
+    
+    validateField(fieldName) {
+      this.$nextTick(() => {
+          const field = this.formConfig.find(f => f.name === fieldName);
+          if (!field) return;
 
-        this.errors[fieldName] = `Máximo ${field.maxLength} caracteres`;
+          delete this.errors[fieldName];
+
+          if (field.required && !this.formData[fieldName]) {
+        this.errors[fieldName] = 'This field is required';
       }
 
-      console.log(this.errors[fieldName])
-    },
+      if (field.type === 'email' && this.formData[fieldName]) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.formData[fieldName])) {
+          this.errors[fieldName] = 'Please enter a valid email';
+        }
+      }
 
-    handleTouchStart(event) {
-      if (!this.signatureContext || !this.canvasInitialized) return;
-      
-      const touch = event.touches[0];
-      const rect = this.$refs.signatureRef.getBoundingClientRect();
-      
-      this.isDrawing = true;
-      this.lastX = touch.clientX - rect.left;
-      this.lastY = touch.clientY - rect.top;
-      this.hasSignature = true;
-    },
+      if (field.minLength && this.formData[fieldName].length < field.minLength) {
+        this.errors[fieldName] = `Minimum ${field.minLength} characters`;
+      }
 
-    handleTouchMove(event) {
-      if (!this.isDrawing || !this.signatureContext || !this.canvasInitialized) return;
-
-      const touch = event.touches[0];
-      const rect = this.$refs.signatureRef.getBoundingClientRect();
-      
-      const currentX = touch.clientX - rect.left;
-      const currentY = touch.clientY - rect.top;
-
-      this.signatureContext.beginPath();
-      this.signatureContext.moveTo(this.lastX, this.lastY);
-      this.signatureContext.lineTo(currentX, currentY);
-      this.signatureContext.stroke();
-
-      this.lastX = currentX;
-      this.lastY = currentY;
+      if (field.maxLength && this.formData[fieldName].length > field.maxLength) {
+        this.errors[fieldName] = `Maximum ${field.maxLength} characters`;
+      }
+      });
     },
 
     startDrawing(event) {
       if (!this.signatureContext || !this.canvasInitialized) return;
       
       const rect = this.$refs.signatureRef.getBoundingClientRect();
-      
       this.isDrawing = true;
       this.lastX = event.clientX - rect.left;
       this.lastY = event.clientY - rect.top;
       this.hasSignature = true;
       this.showSignatureError = false;
     },
-
     draw(event) {
       if (!this.isDrawing || !this.signatureContext || !this.canvasInitialized) return;
 
@@ -420,11 +320,12 @@ export default {
       this.lastX = currentX;
       this.lastY = currentY;
     },
-
     stopDrawing() {
       this.isDrawing = false;
     },
-
+    cancelForm() {
+      this.resetForm();
+    },
     clearSignature() {
       if (this.signatureContext && this.$refs.signatureRef) {
         this.signatureContext.clearRect(
@@ -440,7 +341,6 @@ export default {
     getSignatureData() {
       return this.$refs.signatureRef?.toDataURL() || null;
     },
-
     validateForm() {
       this.formConfig.forEach(field => {
         this.validateField(field.name);
@@ -457,64 +357,34 @@ export default {
       return this.isFormValid && this.hasSignature;
     },
 
-    cancelForm() {
-      this.resetForm();
+    handleSubmit() {
+      if (!this.validateForm()) {
+        console.log('Formulario inválido');
+        return;
+      }
+      this.showSuccessMessage = true;
     },
-  resetForm() {
+    resetForm() {
       Object.keys(this.formData).forEach(key => {
         this.formData[key] = this.formConfig.find(f => f.name === key).type === 'checkbox' || this.formConfig.find(f => f.name === key).type === 'switch' ? false : '';
       });
       this.clearSignature();
       this.hasSignature = false;
       this.showSignatureError = false;
-      Object.keys(this.errors).forEach(key => delete this.errors[key]);
-    },
-
-    handleSubmit() {
-  //console.log("Iniciando submit...");
-  
-  // Verificar el estado de la validación
-  const isValid = this.validateForm();
-  //console.log("¿Formulario válido?:", isValid);
-  
-  if (!isValid) {
-    console.log('Formulario inválido');
-    console.log('Errores:', this.errors);
-    console.log('Estado de firma:', this.hasSignature);
-    return;
-  }
-  
-  const signatureData = this.getSignatureData();
-  const submitData = {
-    ...this.formData,
-    signature: signatureData,
-  };
-  
-  console.log('form:', submitData);
-  
-  // Mostrar mensaje de éxito
-  this.showSuccessMessage = true;
-}
+      this.errors = {};
+    }
   },
-  
-  async mounted() {
-    //console.log("Componente montado");
-    // Inicializar formData
+  mounted() {
     this.formConfig.forEach(field => {
       this.formData[field.name] = field.type === 'checkbox' || field.type === 'switch' ? false : '';
     });
-
-    // Solo inicializar el canvas si el formulario está visible
-    await this.initCanvas();
-
+    this.initCanvas();
   },
-
-  beforeUnmount() {
-    // Limpiar el ResizeObserver
+  beforeDestroy() {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
-  },
+  }
 };
 </script>
 
